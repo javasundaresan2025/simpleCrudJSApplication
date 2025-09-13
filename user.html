@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - CRUD Operations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(254, 202, 87, 0.4);
+        }
+
+        .users-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status {
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 User Management System</h1>
+            <p>Complete CRUD Operations Interface</p>
+        </div>
+        
+        <div class="content">
+            <!-- Status Messages -->
+            <div id="status"></div>
+            
+            <!-- Add User Form -->
+            <div class="form-section">
+                <h2>➕ Add New User</h2>
+                <form id="userForm">
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Full Name" required>
+                        <input type="email" id="email" placeholder="Email Address" required>
+                        <input type="number" id="age" placeholder="Age" min="1" max="120" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </form>
+            </div>
+            
+            <!-- Get Single User -->
+            <div class="form-section">
+                <h2>🔍 Find User by ID</h2>
+                <div class="form-group">
+                    <input type="number" id="searchId" placeholder="Enter User ID" min="1">
+                    <div>
+                        <button type="button" class="btn btn-warning" onclick="getUserById()">Search User</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Update User Form -->
+            <div class="form-section">
+                <h2>✏️ Update User</h2>
+                <form id="updateForm">
+                    <div class="form-group">
+                        <input type="number" id="updateId" placeholder="User ID to Update" required>
+                        <input type="text" id="updateName" placeholder="New Name" required>
+                        <input type="email" id="updateEmail" placeholder="New Email" required>
+                        <input type="number" id="updateAge" placeholder="New Age" min="1" max="120" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update User</button>
+                </form>
+            </div>
+            
+            <!-- Users Table -->
+            <div class="form-section">
+                <h2>👥 All Users</h2>
+                <button type="button" class="btn btn-primary" onclick="loadUsers()" style="margin-bottom: 20px;">
+                    Refresh Users
+                </button>
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Age</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    <div class="spinner"></div>
+                                    Loading users...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        
+        // Show status messages
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Load all users
+        async function loadUsers() {
+            try {
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div>Loading users...</td></tr>';
+                
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No users found</h3><p>Add some users to get started!</p></td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = data.data.map(user => `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.age}</td>
+                            <td class="actions">
+                                <button class="btn btn-danger" onclick="deleteUser(${user.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>Error loading users</h3></td></tr>';
+                    showStatus('Failed to load users', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showStatus('Error connecting to server', 'error');
+                document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="5" class="empty-state"><h3>Connection Error</h3><p>Unable to connect to server</p></td></tr>';
+            }
+        }
+
+        // Add new user
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                age: parseInt(document.getElementById('age').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(`User "${userData.name}" added successfully!`, 'success');
+                    document.getElementById('userForm').reset();
+                    loadUsers();
+                } else {
+                    showStatus(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding user:', error);
+                showStatus('Error connecting to server', 'error');
+            }
+        });
+
+        // Get user by ID
+        async function getUserById() {
+            const userId = document.getElementById('searchId').value;
+            
+            if (!userId) {
+                showStatus('Please enter a user ID', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(`Found User: ${data.data.name} (${data.data.email}) - Age: ${data.data.age}`, 'success');
+                    
+                    // Pre-fill update form with found user data
+                    document.getElementById('updateId').value = data.data.id;
+                    document.getElementById('updateName').value = data.data.name;
+                    document.getElementById('updateEmail').value = data.data.email;
+                    document.getElementById('updateAge').value = data.data.age;
+                } else {
+                    showStatus(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error finding user:', error);
+                showStatus('Error connecting to server', 'error');
+            }
+        }
+
+        // Update user
+        document.getElementById('updateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('updateId').value;
+            const userData = {
+                name: document.getElementById('updateName').value,
+                email: document.getElementById('updateEmail').value,
+                age: parseInt(document.getElementById('updateAge').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(`User "${userData.name}" updated successfully!`, 'success');
+                    document.getElementById('updateForm').reset();
+                    loadUsers();
+                } else {
+                    showStatus(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showStatus('Error connecting to server', 'error');
+            }
+        });
+
+        // Delete user
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(`User deleted successfully!`, 'success');
+                    loadUsers();
+                } else {
+                    showStatus(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showStatus('Error connecting to server', 'error');
+            }
+        }
+
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', loadUsers);
+    </script>
+</body>
+</html>
