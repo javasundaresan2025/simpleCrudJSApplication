@@ -136,7 +136,9 @@ const findUserById = (id) => users.find(user => user.id === parseInt(id));
 
 
 
-// DELETE user (Delete)
+/**
+ * Delete HTTP Method
+ */
 app.delete('/users/:id', (req, res) => {
   const userIndex = users.findIndex(user => user.id === parseInt(req.params.id));
   
