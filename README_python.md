@@ -16,18 +16,7 @@ python --version
 
 If the version is **Python 3.3 or higher**, `venv` is already included.
 
-Verify that `venv` exists by running:
 
-```bash
-python -m venv --help
-```
-
-- ✅ If you see help text, `venv` is available.
-- ❌ If you get an error like *No module named venv*, you need to install `virtualenv` manually:
-  ```bash
-  pip install virtualenv
-  virtualenv myenv
-  ```
 
 ---
 
