@@ -6,7 +6,62 @@
 - **Flask** (will be installed via pip)
 - **Flask-CORS** (will be installed via pip)
 
-## Installation
+## 1. Check if `venv` is available
+
+Run the following command to check Python version:
+
+```bash
+python --version
+```
+
+If the version is **Python 3.3 or higher**, `venv` is already included.
+
+Verify that `venv` exists by running:
+
+```bash
+python -m venv --help
+```
+
+- ✅ If you see help text, `venv` is available.
+- ❌ If you get an error like *No module named venv*, you need to install `virtualenv` manually:
+  ```bash
+  pip install virtualenv
+  virtualenv myenv
+  ```
+
+---
+
+## 2. Create a new virtual environment
+
+Inside your project folder, run:
+
+```bash
+python -m venv myenv
+```
+
+This will create a folder named `myenv` containing the virtual environment.
+
+---
+
+## 3. Activate the virtual environment
+
+- **On Linux/macOS:**
+  ```bash
+  source myenv/bin/activate
+  ```
+
+- **On Windows (PowerShell):**
+  ```powershell
+  myenv\Scripts\activate
+  ```
+
+Once activated, your terminal will show `(myenv)` at the start of the prompt.
+
+---
+
+
+
+## 4. Installation
 
 ```bash
 # Install dependencies
@@ -17,7 +72,7 @@ pip install -r requirements.txt
 
 ```bash
 # Start the Flask server
-python app.py
+python pythonServer.py
 ```
 
 ## Access the Application
